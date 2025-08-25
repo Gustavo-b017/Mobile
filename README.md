@@ -10,3 +10,8 @@
 1. code . -- no terminal anterior entre no vs code
 2. cd (projeto) -- para entrar no projeto
 3. npx react-native run-android -- para rodar o projeto
+
+---
+
+1. npx create-expo-app .
+2. npx expo start
