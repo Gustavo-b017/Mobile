@@ -14,6 +14,7 @@ const App = () => {
   const [valor, setValor] = useState('0');
   const [operacao, setOperacao] = useState<string | null>(null);
   const [numeroAntigo, setNumeroAntigo] = useState<string | null>(null);
+  const [expressao, setExpressao] = useState<string>(''); // Para exibir a expressão
 
   const adicionarValor = (num: string) => {
     if (valor === '0') {
@@ -21,12 +22,14 @@ const App = () => {
     } else {
       setValor(valor + num);
     }
+    setExpressao(expressao + num); // Adiciona o número à expressão
   };
 
   const definirOperacao = (oper: string) => {
     setOperacao(oper);
     setNumeroAntigo(valor);
     setValor('0');
+    setExpressao(expressao + ' ' + oper + ' '); // Adiciona a operação à expressão
   };
 
   const calcular = () => {
@@ -40,16 +43,16 @@ const App = () => {
 
     let resultado = 0;
     switch (operacao) {
-      case 'soma':
+      case '+':
         resultado = num1 + num2;
         break;
-      case 'subtracao':
+      case '-':
         resultado = num1 - num2;
         break;
-      case 'multiplicacao':
+      case 'X':
         resultado = num1 * num2;
         break;
-      case 'divisao':
+      case '%':
         if (num2 === 0) {
           Alert.alert("Erro", "Divisão por zero não permitida.");
           return;
@@ -61,6 +64,7 @@ const App = () => {
     }
 
     setValor(resultado.toString());
+    setExpressao(expressao + ' = ' + resultado); // Exibe o resultado na expressão
     setNumeroAntigo(null);
     setOperacao(null);
   };
@@ -69,6 +73,7 @@ const App = () => {
     setValor('0');
     setNumeroAntigo(null);
     setOperacao(null);
+    setExpressao(''); // Limpa a expressão
   };
 
   return (
@@ -77,36 +82,9 @@ const App = () => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.container}>
           <Text style={styles.resultado}>{valor}</Text>
-          
+          <Text style={styles.expressao}>{expressao}</Text> {/* Exibe a expressão */}
+
           <View style={styles.botoesContainer}>
-            <View style={styles.row}>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('7')}>
-                <Text style={styles.textoBotao}>7</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('8')}>
-                <Text style={styles.textoBotao}>8</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('9')}>
-                <Text style={styles.textoBotao}>9</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('divisao')}>
-                <Text style={styles.textoBotao}>÷</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.row}>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('4')}>
-                <Text style={styles.textoBotao}>4</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('5')}>
-                <Text style={styles.textoBotao}>5</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('6')}>
-                <Text style={styles.textoBotao}>6</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('multiplicacao')}>
-                <Text style={styles.textoBotao}>×</Text>
-              </TouchableOpacity>
-            </View>
             <View style={styles.row}>
               <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('1')}>
                 <Text style={styles.textoBotao}>1</Text>
@@ -117,8 +95,37 @@ const App = () => {
               <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('3')}>
                 <Text style={styles.textoBotao}>3</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('subtracao')}>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('-')}>
                 <Text style={styles.textoBotao}>−</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('4')}>
+                <Text style={styles.textoBotao}>4</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('5')}>
+                <Text style={styles.textoBotao}>5</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('6')}>
+                <Text style={styles.textoBotao}>6</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('X')}>
+                <Text style={styles.textoBotao}>×</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('7')}>
+                <Text style={styles.textoBotao}>7</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('8')}>
+                <Text style={styles.textoBotao}>8</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('9')}>
+                <Text style={styles.textoBotao}>9</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('+')}>
+                <Text style={styles.textoBotao}>+</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.row}>
@@ -131,8 +138,9 @@ const App = () => {
               <TouchableOpacity style={styles.botao} onPress={calcular}>
                 <Text style={styles.textoBotao}>=</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('soma')}>
-                <Text style={styles.textoBotao}>+</Text>
+              
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('%')}>
+                <Text style={styles.textoBotao}>÷</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -170,6 +178,12 @@ const styles = StyleSheet.create({
     fontSize: 50,
     fontWeight: 'bold',
     color: '#333',
+    textAlign: 'right',
+    marginBottom: 10,
+  },
+  expressao: {
+    fontSize: 24,
+    color: '#666',
     textAlign: 'right',
     marginBottom: 30,
   },
