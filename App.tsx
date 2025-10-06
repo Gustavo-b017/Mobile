@@ -4,211 +4,203 @@ import {
   ScrollView,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   StyleSheet,
   StatusBar
 } from 'react-native';
-// A importação está correta conforme a documentação
-import { Picker } from '@react-native-picker/picker';
 
-// Componente principal da Calculadora
 const App = () => {
-  // --- Estados para gerenciar os dados da calculadora ---
-  const [primeiroValor, setPrimeiroValor] = useState('');
-  const [segundoValor, setSegundoValor] = useState('');
-  const [operacao, setOperacao] = useState('soma');
-  const [resultado, setResultado] = useState('');
+  const [valor, setValor] = useState('0');
+  const [operacao, setOperacao] = useState<string | null>(null);
+  const [numeroAntigo, setNumeroAntigo] = useState<string | null>(null);
 
-  const limparCampos = () => {
-    setPrimeiroValor('');
-    setSegundoValor('');
-    setOperacao('soma');
-    setResultado('');
+  const adicionarValor = (num: string) => {
+    if (valor === '0') {
+      setValor(num);
+    } else {
+      setValor(valor + num);
+    }
+  };
+
+  const definirOperacao = (oper: string) => {
+    setOperacao(oper);
+    setNumeroAntigo(valor);
+    setValor('0');
   };
 
   const calcular = () => {
-    const num1 = parseFloat(primeiroValor.replace(',', '.'));
-    const num2 = parseFloat(segundoValor.replace(',', '.'));
+    const num1 = parseFloat(numeroAntigo ?? '0');
+    const num2 = parseFloat(valor);
 
     if (isNaN(num1) || isNaN(num2)) {
-      Alert.alert("Erro de Entrada", "Por favor, insira números válidos em ambos os campos.");
+      Alert.alert("Erro", "Por favor, insira números válidos.");
       return;
     }
 
-    let calculoFinal = 0;
-
+    let resultado = 0;
     switch (operacao) {
       case 'soma':
-        calculoFinal = num1 + num2;
+        resultado = num1 + num2;
         break;
       case 'subtracao':
-        calculoFinal = num1 - num2;
+        resultado = num1 - num2;
         break;
       case 'multiplicacao':
-        calculoFinal = num1 * num2;
+        resultado = num1 * num2;
         break;
       case 'divisao':
         if (num2 === 0) {
-          Alert.alert("Erro Matemático", "Divisão por zero não é permitida.");
+          Alert.alert("Erro", "Divisão por zero não permitida.");
           return;
         }
-        calculoFinal = num1 / num2;
+        resultado = num1 / num2;
         break;
       default:
         return;
     }
 
-    setResultado(`Resultado: ${calculoFinal.toFixed(2).replace('.', ',')}`);
+    setValor(resultado.toString());
+    setNumeroAntigo(null);
+    setOperacao(null);
+  };
+
+  const limpar = () => {
+    setValor('0');
+    setNumeroAntigo(null);
+    setOperacao(null);
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={styles.safeArea.backgroundColor} />
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.container}>
-          <Text style={styles.titulo}>Calculadora Profissional RN</Text>
-          <Text style={styles.subtitulo}>Insira os valores e selecione a operação</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Digite o primeiro valor"
-            placeholderTextColor="#888"
-            keyboardType="numeric"
-            value={primeiroValor}
-            onChangeText={setPrimeiroValor}
-          />
-           
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={operacao}
-              onValueChange={(itemValue: string) => setOperacao(itemValue)}
-              style={styles.picker}
-            >
-              <Picker.Item label="Adição (+)" value="soma" />
-              <Picker.Item label="Subtração (-)" value="subtracao" />
-              <Picker.Item label="Multiplicação (×)" value="multiplicacao" />
-              <Picker.Item label="Divisão (÷)" value="divisao" />
-            </Picker>
+          <Text style={styles.resultado}>{valor}</Text>
+          
+          <View style={styles.botoesContainer}>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('7')}>
+                <Text style={styles.textoBotao}>7</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('8')}>
+                <Text style={styles.textoBotao}>8</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('9')}>
+                <Text style={styles.textoBotao}>9</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('divisao')}>
+                <Text style={styles.textoBotao}>÷</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('4')}>
+                <Text style={styles.textoBotao}>4</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('5')}>
+                <Text style={styles.textoBotao}>5</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('6')}>
+                <Text style={styles.textoBotao}>6</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('multiplicacao')}>
+                <Text style={styles.textoBotao}>×</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('1')}>
+                <Text style={styles.textoBotao}>1</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('2')}>
+                <Text style={styles.textoBotao}>2</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('3')}>
+                <Text style={styles.textoBotao}>3</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('subtracao')}>
+                <Text style={styles.textoBotao}>−</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.row}>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('0')}>
+                <Text style={styles.textoBotao}>0</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => adicionarValor('.')}>
+                <Text style={styles.textoBotao}>.</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={calcular}>
+                <Text style={styles.textoBotao}>=</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.botao} onPress={() => definirOperacao('soma')}>
+                <Text style={styles.textoBotao}>+</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Digite o segundo valor"
-            placeholderTextColor="#888"
-            keyboardType="numeric"
-            value={segundoValor}
-            onChangeText={setSegundoValor}
-          />
-
-          <TouchableOpacity style={styles.botaoCalcular} onPress={calcular} activeOpacity={0.7}>
-            <Text style={styles.textoBotao}>Calcular</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.botaoLimpar} onPress={limparCampos} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.botaoLimpar} onPress={limpar}>
             <Text style={styles.textoBotao}>Limpar</Text>
           </TouchableOpacity>
-
-          {resultado ? (
-            <View style={styles.containerResultado}>
-              <Text style={styles.textoResultado}>{resultado}</Text>
-            </View>
-          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-// ... O objeto 'styles' permanece o mesmo
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F0F2F5',
+    backgroundColor: '#F4F6F9',
   },
   scrollViewContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    padding: 20,
   },
   container: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
     padding: 20,
-    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 20,
-  },
-  titulo: {
-    fontSize: 26,
+  resultado: {
+    fontSize: 50,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 10,
-  },
-  subtitulo: {
-    fontSize: 16,
-    color: '#666',
+    textAlign: 'right',
     marginBottom: 30,
   },
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    marginBottom: 15,
+  botoesContainer: {
+    flexDirection: 'column',
   },
-  pickerContainer: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 8,
-    marginBottom: 15,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  botao: {
+    width: '22%',
+    height: 70,
+    backgroundColor: '#333',
+    borderRadius: 15,
     justifyContent: 'center',
-    backgroundColor: '#FFF',
-  },
-  picker: {
-    width: '100%',
-    height: '100%',
-  },
-  botaoCalcular: {
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
+    marginBottom: 15,
+  },
+  textoBotao: {
+    color: '#FFF',
+    fontSize: 28,
+    fontWeight: 'bold',
   },
   botaoLimpar: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#6C757D',
-    borderRadius: 8,
+    backgroundColor: '#BDBDBD',
+    borderRadius: 15,
     alignItems: 'center',
-    marginTop: 10,
-  },
-  textoBotao: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  containerResultado: {
-    marginTop: 30,
-    padding: 20,
-    backgroundColor: '#E1F5FE',
-    borderRadius: 8,
-    width: '100%',
-    alignItems: 'center',
-  },
-  textoResultado: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#01579B',
+    marginTop: 20,
   },
 });
 
