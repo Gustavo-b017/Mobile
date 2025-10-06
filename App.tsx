@@ -157,7 +157,7 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F4F6F9',
+    backgroundColor: '#7386a1',
   },
   scrollViewContainer: {
     flexGrow: 1,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   container: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#98a2b1',
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   botaoLimpar: {
     width: '100%',
     padding: 15,
-    backgroundColor: '#BDBDBD',
+    backgroundColor: '#ac4e4e',
     borderRadius: 15,
     alignItems: 'center',
     marginTop: 20,
