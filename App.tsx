@@ -4,386 +4,221 @@ import {
   ScrollView,
   View,
   Text,
+  TextInput,
+  StyleSheet,
   TouchableOpacity,
   Alert,
-  StyleSheet,
-  StatusBar,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 const App = () => {
-  const [valor, setValor] = useState('0');
-  const [operacao, setOperacao] = useState<string | null>(null);
-  const [numeroAntigo, setNumeroAntigo] = useState<string | null>(null);
-  const [expressao, setExpressao] = useState<string>(''); // Para exibir a expressão
-
-  const adicionarValor = (num: string) => {
-    if (valor === '0') {
-      setValor(num);
-    } else {
-      setValor(valor + num);
-    }
-    setExpressao(expressao + num); // Adiciona o número à expressão
-  };
-
-  const definirOperacao = (oper: string) => {
-    setOperacao(oper);
-    setNumeroAntigo(valor);
-    setValor('0');
-    setExpressao(expressao + ' ' + oper + ' '); // Adiciona a operação à expressão
-  };
+  const [num1, setNum1] = useState('');
+  const [num2, setNum2] = useState('');
+  const [operacao, setOperacao] = useState('+');
+  const [resultado, setResultado] = useState('');
 
   const calcular = () => {
-    const num1 = parseFloat(numeroAntigo ?? '0');
-    const num2 = parseFloat(valor);
+    const n1 = parseFloat(num1);
+    const n2 = parseFloat(num2);
 
-    if (isNaN(num1) || isNaN(num2)) {
+    if (isNaN(n1) || isNaN(n2)) {
       Alert.alert('Erro', 'Por favor, insira números válidos.');
       return;
     }
 
-    let resultado = 0;
+    let res = 0;
     switch (operacao) {
       case '+':
-        resultado = num1 + num2;
+        res = n1 + n2;
         break;
       case '-':
-        resultado = num1 - num2;
+        res = n1 - n2;
         break;
-      case 'X':
-        resultado = num1 * num2;
+      case '*':
+        res = n1 * n2;
         break;
-      case '%':
-        resultado = (num1 * num2) / 100;
-        break;
-      case '/': // Divisão
-        if (num2 === 0) {
-          Alert.alert('Erro', 'Divisão por zero não permitida.');
+      case '/':
+        if (n2 === 0) {
+          Alert.alert('Erro', 'Divisão por zero não é permitida.');
           return;
         }
-        resultado = num1 / num2;
+        res = n1 / n2;
+        break;
+      case '%':
+        res = (n1 * n2) / 100;
         break;
       default:
         return;
     }
 
-    setValor(resultado.toString());
-    setExpressao(expressao + ' = ' + resultado); // Exibe o resultado na expressão
-    setNumeroAntigo(null);
-    setOperacao(null);
+    setResultado(res.toString());
   };
 
   const limpar = () => {
-    setValor('0');
-    setNumeroAntigo(null);
-    setOperacao(null);
-    setExpressao(''); // Limpa a expressão
-  }; // 🚨 FUNÇÃO ALTERADA AQUI 🚨
-
-  const alternarSinal = () => {
-    setValor(prevValor => {
-      let novoValor;
-      if (prevValor.startsWith('-')) {
-        novoValor = prevValor.slice(1); // Remove o sinal negativo
-      } else {
-        novoValor = '-' + prevValor; // Adiciona o sinal negativo
-      }
-
-      // Atualiza a expressão removendo o valor anterior e adicionando o novoValor.
-      setExpressao(prevExpressao => {
-        const index = prevExpressao.lastIndexOf(prevValor);
-
-        // Se o valor anterior for encontrado no final da expressão, substitui.
-        if (index !== -1 && index + prevValor.length === prevExpressao.length) {
-          return prevExpressao.substring(0, index) + novoValor;
-        }
-
-        // Caso seja o primeiro número (e a expressão é igual ao valor), substitui a expressão.
-        if (prevExpressao === prevValor) {
-          return novoValor;
-        }
-
-        // Se nenhuma das condições acima for atendida, retorna a expressão anterior.
-        return prevExpressao;
-      });
-
-      return novoValor;
-    });
-  };
-  // 🚨 FIM DA FUNÇÃO ALTERADA 🚨
-
-  const apagarUltimoNumero = () => {
-    if (valor.length === 1) {
-      setValor('0');
-    } else {
-      setValor(valor.slice(0, -1)); // Apaga o último número
-    }
-    setExpressao(expressao.slice(0, -1)); // Apaga o último caractere da expressão
+    setNum1('');
+    setNum2('');
+    setResultado('');
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />     {' '}
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-               {' '}
+      <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.container}>
-                    <Text style={styles.expressao}>{expressao}</Text>{' '}
-          {/* Exibe a expressão */}         {' '}
-          <Text style={styles.resultado}>{valor}</Text>{' '}
-          {/* Exibe o resultado abaixo da expressão */}         {' '}
-          <View style={styles.botoesContainer}>
-                       {' '}
-            <View style={styles.row}>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={apagarUltimoNumero}
-              >
-                                <Text style={styles.textoBotao}>⌫</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity style={styles.botaoLimpar} onPress={limpar}>
-                                <Text style={styles.textoBotao}>AC</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => definirOperacao('%')}
-              >
-                                <Text style={styles.textoBotao}>%</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => definirOperacao('/')}
-              >
-                                <Text style={styles.textoBotao}>÷</Text>       
-                     {' '}
-              </TouchableOpacity>
-                         {' '}
-            </View>
-                       {' '}
-            <View style={styles.row}>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('1')}
-              >
-                                <Text style={styles.textoBotao}>1</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('2')}
-              >
-                                <Text style={styles.textoBotao}>2</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('3')}
-              >
-                                <Text style={styles.textoBotao}>3</Text>       
-                     {' '}
-              </TouchableOpacity>
-                                         {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => definirOperacao('X')}
-              >
-                                <Text style={styles.textoBotao}>×</Text>       
-                     {' '}
-              </TouchableOpacity>
-                         {' '}
-            </View>
-                       {' '}
-            <View style={styles.row}>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('4')}
-              >
-                                <Text style={styles.textoBotao}>4</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('5')}
-              >
-                                <Text style={styles.textoBotao}>5</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('6')}
-              >
-                                <Text style={styles.textoBotao}>6</Text>       
-                     {' '}
-              </TouchableOpacity>
-                                         {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => definirOperacao('-')}
-              >
-                                <Text style={styles.textoBotao}>−</Text>       
-                     {' '}
-              </TouchableOpacity>
-                         {' '}
-            </View>
-                       {' '}
-            <View style={styles.row}>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('7')}
-              >
-                                <Text style={styles.textoBotao}>7</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('8')}
-              >
-                                <Text style={styles.textoBotao}>8</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('9')}
-              >
-                                <Text style={styles.textoBotao}>9</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => definirOperacao('+')}
-              >
-                                <Text style={styles.textoBotao}>+</Text>       
-                     {' '}
-              </TouchableOpacity>
-                         {' '}
-            </View>
-                       {' '}
-            <View style={styles.row}>
-                           {' '}
-              <TouchableOpacity style={styles.botao} onPress={alternarSinal}>
-                                <Text style={styles.textoBotao}>±</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('0')}
-              >
-                                <Text style={styles.textoBotao}>0</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity
-                style={styles.botao}
-                onPress={() => adicionarValor('.')}
-              >
-                                <Text style={styles.textoBotao}>.</Text>       
-                     {' '}
-              </TouchableOpacity>
-                           {' '}
-              <TouchableOpacity style={styles.botao} onPress={calcular}>
-                                <Text style={styles.textoBotao}>=</Text>       
-                     {' '}
-              </TouchableOpacity>
-                         {' '}
-            </View>
-                     {' '}
+          <Text style={styles.titulo}>Calculadora</Text>
+
+          {/* Formulário 1 */}
+          <View style={styles.formulario}>
+            <Text style={styles.label}>Primeiro número:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o primeiro número"
+              keyboardType="numeric"
+              value={num1}
+              onChangeText={setNum1}
+            />
           </View>
-                 {' '}
+
+          {/* Formulário 2 */}
+          <View style={styles.formulario}>
+            <Text style={styles.label}>Segundo número:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o segundo número"
+              keyboardType="numeric"
+              value={num2}
+              onChangeText={setNum2}
+            />
+          </View>
+
+          {/* Picker para operação */}
+          <View style={styles.pickerContainer}>
+            <Text style={styles.label}>Selecione a operação:</Text>
+            <Picker
+              selectedValue={operacao}
+              style={styles.picker}
+              onValueChange={(itemValue) => setOperacao(itemValue)}
+            >
+              <Picker.Item label="Adição (+)" value="+" />
+              <Picker.Item label="Subtração (-)" value="-" />
+              <Picker.Item label="Multiplicação (×)" value="*" />
+              <Picker.Item label="Divisão (÷)" value="/" />
+              <Picker.Item label="Porcentagem (%)" value="%" />
+            </Picker>
+          </View>
+
+          {/* Botões */}
+          <View style={styles.botoesContainer}>
+            <TouchableOpacity style={styles.botao} onPress={calcular}>
+              <Text style={styles.textoBotao}>Calcular</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.botao, styles.botaoLimpar]}
+              onPress={limpar}
+            >
+              <Text style={styles.textoBotao}>Limpar</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Resultado */}
+          <View style={styles.resultadoContainer}>
+            <Text style={styles.resultadoLabel}>Resultado:</Text>
+            <Text style={styles.resultadoValor}>
+              {resultado !== '' ? resultado : '—'}
+            </Text>
+          </View>
         </View>
-             {' '}
       </ScrollView>
-         {' '}
     </SafeAreaView>
   );
 };
 
+// 🎨 Estilos
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#f3f6f9',
   },
-  scrollViewContainer: {
+  scroll: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
   },
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 30,
-    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    padding: 25,
+    alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 15,
+    shadowRadius: 8,
     elevation: 5,
   },
-  expressao: {
-    fontSize: 24,
-    color: '#888',
-    textAlign: 'right',
-    marginBottom: 10,
-  },
-  resultado: {
-    fontSize: 60,
-    fontWeight: '600',
+  titulo: {
+    fontSize: 26,
+    fontWeight: 'bold',
     color: '#333',
-    textAlign: 'right',
-    marginBottom: 30,
+    marginBottom: 20,
   },
-  botoesContainer: {
-    flexDirection: 'column',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  formulario: {
+    width: '100%',
     marginBottom: 15,
   },
-  botao: {
-    width: '22%',
-    height: 70,
-    backgroundColor: '#4A90E2',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
+  label: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 5,
   },
-  textoBotao: {
-    color: '#FFF',
-    fontSize: 28,
-    fontWeight: 'bold',
+  input: {
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    padding: 10,
+    fontSize: 18,
+  },
+  pickerContainer: {
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginVertical: 10,
+  },
+  picker: {
+    width: '100%',
+  },
+  botoesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginVertical: 20,
+  },
+  botao: {
+    flex: 1,
+    backgroundColor: '#4A90E2',
+    marginHorizontal: 5,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
   botaoLimpar: {
-    backgroundColor: '#FF4B4B',
-    width: '22%',
-    height: 70,
-    borderRadius: 20,
-    justifyContent: 'center',
+    backgroundColor: '#E94E4E',
+  },
+  textoBotao: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  resultadoContainer: {
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
+    marginBottom: 10,
+  },
+  resultadoLabel: {
+    fontSize: 18,
+    color: '#666',
+  },
+  resultadoValor: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 
